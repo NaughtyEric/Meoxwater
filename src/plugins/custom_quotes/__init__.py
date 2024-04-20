@@ -3,7 +3,7 @@ import json
 from nonebot import get_driver, on_fullmatch
 
 from .config import Config
-from nonebot.adapters.mirai2 import MessageSegment
+from nonebot.adapters.onebot.v11 import MessageSegment, GroupMessageEvent
 
 import os
 import random
@@ -20,9 +20,9 @@ caramel_event = on_fullmatch(("焦糖", "caramel"), priority=5, ignorecase=True)
 caramel_said = ["捏的怎么人人都会拇指MM夕烧"]
 
 @caramel_event.handle()
-async def caramel():
+async def caramel(bot, event: GroupMessageEvent):
     # 群聊必须是657148784
-    if caramel_event.ctx["message_type"] != "group" or caramel_event.ctx["group_id"] != 657148784:
+    if event.group_id != 657148784:
         return
     if not os.path.exists(path + "caramel"):
         await caramel_event.finish("暂无焦糖语录。")
