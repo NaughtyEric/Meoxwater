@@ -24,16 +24,16 @@ async def caramel(bot, event: GroupMessageEvent):
     # 群聊必须是657148784
     if event.group_id != 657148784:
         return
-    if not os.path.exists(path + "caramel"):
+    if not os.path.exists(path + "/caramel"):
         await caramel_event.finish("暂无焦糖语录。")
-    img_count = len(os.listdir(path + "caramel"))
+    img_count = len(os.listdir(path + "/caramel"))
     rnd = random.randint(1, img_count)
     if rnd > img_count:
         rnd -= img_count
         await caramel_event.finish(caramel_said[rnd])
     else:
         # 先检查是否有对应的图片，忽略后缀
-        for file in os.listdir(path + "caramel"):
+        for file in os.listdir(path + "/caramel"):
             if re.match(f"{rnd}.*", file):
                 extention = file.split(".")[-1]
                 if extention.lower() not in ["jpg", "jpeg", "png", "gif", "bmp"]:
