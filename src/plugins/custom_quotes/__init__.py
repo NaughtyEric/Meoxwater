@@ -21,6 +21,9 @@ caramel_said = ["捏的怎么人人都会拇指MM夕烧"]
 
 @caramel_event.handle()
 async def caramel():
+    # 群聊必须是657148784
+    if caramel_event.ctx["message_type"] != "group" or caramel_event.ctx["group_id"] != 657148784:
+        return
     if not os.path.exists(path + "caramel"):
         await caramel_event.finish("暂无焦糖语录。")
     img_count = len(os.listdir(path + "caramel"))
