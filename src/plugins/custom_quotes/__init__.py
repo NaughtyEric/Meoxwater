@@ -38,7 +38,7 @@ async def caramel(bot, event: GroupMessageEvent):
                 extention = file.split(".")[-1]
                 if extention.lower() not in ["jpg", "jpeg", "png", "gif", "bmp"]:
                     await caramel_event.finish(f"喵呜？第{rnd}张图片存在问题！")
-                await caramel_event.finish(MessageSegment.image(f"{path}/caramel/{rnd}.{extention}"))
+                await caramel_event.finish(MessageSegment.image(f"file:///{path}/caramel/{file}"))
         await caramel_event.finish(f"咿呀！图片不存在喵！")
 
 
