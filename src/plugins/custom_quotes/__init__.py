@@ -34,7 +34,7 @@ async def caramel(bot, event: GroupMessageEvent):
     rnd = random.randint(1, img_count + len(caramel_said))
     if rnd > img_count:
         rnd -= img_count
-        await caramel_event.finish(caramel_said[rnd])
+        await caramel_event.finish(caramel_said[rnd - 1])
     else:
         # 先检查是否有对应的图片，忽略后缀
         for file in os.listdir(path + "/caramel"):
