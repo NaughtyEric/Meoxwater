@@ -1,6 +1,8 @@
 import json
 
-from nonebot import get_driver, on_fullmatch
+from nonebot import get_driver, on_fullmatch, on_command
+from nonebot.matcher import Matcher
+from nonebot.rule import CommandArg, Message
 
 from .config import Config
 from nonebot.adapters.onebot.v11 import MessageSegment, GroupMessageEvent
@@ -17,7 +19,9 @@ config = Config.parse_obj(global_config)
 path = global_config.quote_path
 
 caramel_event = on_fullmatch(("焦糖", "caramel"), priority=5, ignorecase=True)
-caramel_said = ["捏的怎么人人都会拇指MM夕烧"]
+caramel_said = ["捏的怎么人人都会拇指MM夕烧", "这下爆典了"]
+
+submit = on_command("submit", priority=5)
 
 @caramel_event.handle()
 async def caramel(bot, event: GroupMessageEvent):
@@ -27,7 +31,7 @@ async def caramel(bot, event: GroupMessageEvent):
     if not os.path.exists(path + "/caramel"):
         await caramel_event.finish("暂无焦糖语录。")
     img_count = len(os.listdir(path + "/caramel"))
-    rnd = random.randint(1, img_count)
+    rnd = random.randint(1, img_count + len(caramel_said))
     if rnd > img_count:
         rnd -= img_count
         await caramel_event.finish(caramel_said[rnd])
