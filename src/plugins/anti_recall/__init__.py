@@ -86,6 +86,7 @@ async def force_refresh_handle(event: PrivateMessageEvent):
         return
     anti_recall.manager.remove_all_cache()
     anti_recall.manager.remove_expired_data()
-    await force_refresh.finish('缓存清理完成')
+    anti_recall.reload_config()
+    await force_refresh.finish('重载完成')
 
 
