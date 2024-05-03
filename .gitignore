@@ -110,6 +110,10 @@ celerybeat.pid
 
 # Environments
 .env
+.env.dev
+.env.prod
+config/
+datamsg_record/
 .venv
 env/
 venv/
