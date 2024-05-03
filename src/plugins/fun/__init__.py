@@ -1,10 +1,18 @@
 # 花里胡哨的东西想到了就加进来
-
-from nonebot import on_keyword
+import nonebot.adapters
+from nonebot import on_keyword, on_command, get_driver
+from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent
+from nonebot.config import Config
+from nonebot.exception import MatcherException
+from nonebot.params import CommandArg
 import time
+import datetime
+
+global_config = get_driver().config
 
 good_night = on_keyword({'晚安', '晚安啦', '晚安了'}, priority=5)
 good_morning = on_keyword({'早上好', '早安'}, priority=5)
+sleep_immediately = on_command('睡觉', aliases={'sleep'}, priority=5)
 
 @good_night.handle()
 async def _(bot, event):
@@ -27,3 +35,31 @@ async def _(bot, event):
         await good_morning.finish('（戳表）这都几点了喵！还在早安？起床，起床喵！')
     else:
         await good_morning.finish('早上好……喵？（陷入思考）（死机）')
+
+
+@sleep_immediately.handle()
+async def _(bot: Bot, event, message: nonebot.adapters.Message = CommandArg()):
+    WHITELIST = global_config.whitelist
+    if isinstance(event, GroupMessageEvent):
+        sender = event.sender.user_id
+        if sender in WHITELIST:
+            await sleep_immediately.finish('好的，晚安~')
+        else:
+            msg = message.extract_plain_text()
+            try:
+                time_length = float(msg)
+                if time_length <= 0:
+                    await sleep_immediately.finish('睡觉时长必须大于0。')
+                # 转换为秒
+                scd = int(time_length * 3600)
+                await bot.set_group_ban(group_id=event.group_id, user_id=event.sender.user_id, duration=scd)
+                current_time = datetime.datetime.now()
+                sleep_time = current_time + datetime.timedelta(seconds=scd)
+                await sleep_immediately.finish(f'好的，晚安喵~\n你的起床时间是{sleep_time.strftime("%Y-%m-%d %H:%M:%S")}'
+                                               f'，到时候再来水群吧')
+            except ValueError:
+                await sleep_immediately.finish('请指定睡觉时长。')
+            except MatcherException:
+                raise
+            except Exception as e:
+                await sleep_immediately.finish(f'好的，晚安喵~')
