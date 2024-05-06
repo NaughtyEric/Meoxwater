@@ -62,4 +62,4 @@ async def _(bot: Bot, event, message: nonebot.adapters.Message = CommandArg()):
             except MatcherException:
                 raise
             except Exception as e:
-                await sleep_immediately.finish(f'好的，晚安喵~')
+                await sleep_immediately.finish(f'好的，晚安喵~\nTips: /sleep <时长>获取深度睡眠。')

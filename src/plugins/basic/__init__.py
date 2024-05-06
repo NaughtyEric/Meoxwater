@@ -7,27 +7,28 @@ from .config import Config
 
 global_config = get_driver().config
 config = Config.parse_obj(global_config)
-WHITELIST = global_config.whitelist
+BLOCKLIST = global_config.blocklist
 
+# 检测是否在线
 ping_checker = on_command("ping", aliases={"测试"}, rule=to_me)
-
+# 墨痕縩篳：测试寄气人在线性
 mohen_checker = on_keyword({"墨痕", "mohen"})
-
-# blocker = on_message(priority=100)
+# 阻塞：阻止不同机器人之间无限递归
+blocker = on_message(priority=1)
 
 # 启动时加载
 @get_driver().on_startup
 async def on_startup():
-    log.logger.debug(f"白名单: {WHITELIST}")
+    log.logger.debug(f"阻塞名单: {BLOCKLIST}")
 
 @ping_checker.handle()
 async def checker_func():
     await ping_checker.finish("pong!")
 
-# @blocker.handle()
-# async def blocker_func(message: MessageEvent, matcher: Matcher):
-#     if message.sender.user_id in WHITELIST:
-#         matcher.stop_propagation()
+@blocker.handle()
+async def blocker_func(message: MessageEvent, matcher: Matcher):
+    if message.sender.user_id in BLOCKLIST:
+        matcher.stop_propagation()
 
 
 @mohen_checker.handle()

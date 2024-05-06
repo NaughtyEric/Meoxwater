@@ -18,7 +18,8 @@ class AntiRecall:
         "activated_groups": [],
         "cache_expire": 240,
         "data_expire": 2,
-        "admins": []
+        "admins": [],
+        "ignore": []
     }
 
     def __init__(self, file_path, data_path):
