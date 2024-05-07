@@ -17,7 +17,7 @@ ping_checker = on_command("ping", aliases={"测试"}, rule=to_me)
 # 墨痕縩篳：测试寄气人在线性
 mohen_checker = on_keyword({"墨痕", "mohen"})
 # 阻塞：阻止不同机器人之间无限递归，也可以当成黑名单用
-blocker = on_message(priority=1)
+blocker = on_message(priority=1, block=False)
 add_blocker = on_command("block", rule=to_me)
 remove_blocker = on_command("unblock", rule=to_me)
 print_blocker = on_command("blocklist", rule=to_me)
@@ -32,7 +32,7 @@ async def checker_func():
     await ping_checker.finish("pong!")
 
 @blocker.handle()
-async def blocker_func(message: MessageEvent, matcher: Matcher):
+async def _(message: MessageEvent, matcher: Matcher):
     if message.sender.user_id in BLOCKLIST:
         matcher.stop_propagation()
     else:
@@ -43,10 +43,10 @@ async def blocker_func(message: MessageEvent, matcher: Matcher):
 async def add_blocker_func(message: MessageEvent):
     # 查找是否@了人
     sender = message.sender.user_id
-    at_list = re.findall(r"\[CQ:at,qq=(\d+)]", message.get_plaintext())
-    at_list = [int(at) for at in at_list if int(at) != sender and int(at) not in BLOCKLIST]
+    at_list = re.findall(r"\[at:qq=(\d+)]", str(message.get_message()))
+    at_list = [int(at) for at in at_list if (int(at) != sender and int(at) not in BLOCKLIST and int(at) not in ADMIN)]
     if at_list:
-        BLOCKLIST.append(int(at_list))
+        BLOCKLIST.extend(at_list)
         # 刷新配置
         global_config.blocklist = BLOCKLIST
         await add_blocker.finish(f"已将{str(at_list).strip('[]')}加入阻塞名单。")
@@ -57,8 +57,9 @@ async def add_blocker_func(message: MessageEvent):
 async def remove_blocker_func(message: MessageEvent):
     # 查找是否@了人
     sender = message.sender.user_id
-    at_list = re.findall(r"\[CQ:at,qq=(\d+)]", message.get_plaintext())
+    at_list = re.findall(r"\[at:qq=(\d+)]", message.get_plaintext())
     at_list = [int(at) for at in at_list if int(at) != sender and int(at) in BLOCKLIST]
+    log.logger.info(f"尝试将{at_list}从阻塞名单中移除。")
     if at_list:
         for at in at_list:
             BLOCKLIST.remove(at)
