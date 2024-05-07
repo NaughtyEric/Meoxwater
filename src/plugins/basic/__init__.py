@@ -40,11 +40,12 @@ async def _(message: MessageEvent, matcher: Matcher):
         await matcher.finish()
 
 @add_blocker.handle()
-async def add_blocker_func(message: MessageEvent):
+async def add_blocker_func(bot: Bot, message: MessageEvent):
     # 查找是否@了人
     sender = message.sender.user_id
-    at_list = re.findall(r"\[at:qq=(\d+)]", str(message.get_message()))
-    at_list = [int(at) for at in at_list if (int(at) != sender and int(at) not in BLOCKLIST and int(at) not in ADMIN)]
+    at_list = re.findall(r"\[CQ:at,qq=(\d+)]", message.raw_message)
+    at_list = [int(at) for at in at_list if
+               (int(at) != sender and int(at) not in BLOCKLIST and int(at) not in ADMIN and int(at) != int(bot.self_id))]
     if at_list:
         BLOCKLIST.extend(at_list)
         # 刷新配置
@@ -57,9 +58,9 @@ async def add_blocker_func(message: MessageEvent):
 async def remove_blocker_func(message: MessageEvent):
     # 查找是否@了人
     sender = message.sender.user_id
-    at_list = re.findall(r"\[at:qq=(\d+)]", message.get_plaintext())
-    at_list = [int(at) for at in at_list if int(at) != sender and int(at) in BLOCKLIST]
-    log.logger.info(f"尝试将{at_list}从阻塞名单中移除。")
+    at_list = re.findall(r"\[CQ:at,qq=(\d+)]", message.raw_message)
+    at_list = [int(at) for at in at_list if
+               (int(at) in BLOCKLIST and int(at) != sender and int(at) not in ADMIN)]
     if at_list:
         for at in at_list:
             BLOCKLIST.remove(at)
