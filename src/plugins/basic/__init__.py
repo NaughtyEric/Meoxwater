@@ -35,6 +35,9 @@ async def checker_func():
 async def blocker_func(message: MessageEvent, matcher: Matcher):
     if message.sender.user_id in BLOCKLIST:
         matcher.stop_propagation()
+    else:
+        log.logger.debug(f"未被阻塞的消息: {message.get_plaintext()}")
+        await matcher.finish()
 
 @add_blocker.handle()
 async def add_blocker_func(message: MessageEvent):
@@ -44,6 +47,8 @@ async def add_blocker_func(message: MessageEvent):
     at_list = [int(at) for at in at_list if int(at) != sender and int(at) not in BLOCKLIST]
     if at_list:
         BLOCKLIST.append(int(at_list))
+        # 刷新配置
+        global_config.blocklist = BLOCKLIST
         await add_blocker.finish(f"已将{str(at_list).strip('[]')}加入阻塞名单。")
     else:
         await add_blocker.finish("请@要加入阻塞名单的人。不能将自己或已被阻塞的人加入阻塞名单。")
@@ -57,6 +62,8 @@ async def remove_blocker_func(message: MessageEvent):
     if at_list:
         for at in at_list:
             BLOCKLIST.remove(at)
+        # 刷新配置
+        global_config.blocklist = BLOCKLIST
         await remove_blocker.finish(f"已将{str(at_list).strip('[]')}从阻塞名单中移除。")
     else:
         await remove_blocker.finish("请@要从阻塞名单中移除的人。不能将自己或未被阻塞的人从阻塞名单中移除。")
