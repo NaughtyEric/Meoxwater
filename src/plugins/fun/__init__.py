@@ -13,10 +13,27 @@ global_config = get_driver().config
 good_night = on_keyword({'晚安', '晚安啦', '晚安了'}, priority=5)
 good_morning = on_keyword({'早上好', '早安'}, priority=5)
 sleep_immediately = on_command('睡觉', aliases={'sleep'}, priority=5)
+IGNORE = []
+
+def add_ignore(user_id: int):
+    IGNORE.append((user_id, time.time()))
+
+def remove_ignore():
+    # CD 5分钟
+    for i in range(len(IGNORE)):
+        if time.time() - IGNORE[i][1] >= 300:
+            IGNORE.pop(i)
+            break
+
 
 @good_night.handle()
-async def _(bot, event):
+async def _(bot, event: GroupMessageEvent):
     t = time.localtime()
+    sender = event.sender.user_id
+    remove_ignore()
+    if sender in [i[0] for i in IGNORE]:
+        return
+    add_ignore(sender)
     # 如果是在晚上十点到十二点之间，就回复晚安
     if 22 <= t.tm_hour < 24:
         await good_night.finish('晚安喵，愿你的梦境不受梦魇侵扰~')
@@ -27,8 +44,13 @@ async def _(bot, event):
         await good_night.finish('啊……呃，晚安……喵？')
 
 @good_morning.handle()
-async def _(bot, event):
+async def _(bot, event: GroupMessageEvent):
     t = time.localtime()
+    sender = event.sender.user_id
+    remove_ignore()
+    if sender in [i[0] for i in IGNORE]:
+        return
+    add_ignore(sender)
     if 5 <= t.tm_hour < 10:
         await good_morning.finish('早上好，新的一天也要活力满满喵~')
     elif 10 <= t.tm_hour < 17:
