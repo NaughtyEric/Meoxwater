@@ -21,7 +21,7 @@ async def on_startup():
     anti_recall = AntiRecall('./config/anti_recall.json', "./datamsg_record/")
 
 
-recall = on_notice()
+recall = on_notice(priority=1)
 @recall.handle()
 async def recall_handle(bot: Bot, event: GroupRecallNoticeEvent):
     global anti_recall

@@ -13,19 +13,24 @@ BLOCKLIST = global_config.blocklist
 ADMIN = global_config.admin
 
 # 检测是否在线
-ping_checker = on_command("ping", aliases={"测试"}, rule=to_me)
+ping_checker = on_command("ping", aliases={"测试"}, rule=to_me, priority=5)
 # 墨痕縩篳：测试寄气人在线性
-mohen_checker = on_keyword({"墨痕", "mohen"})
+mohen_checker = on_keyword({"墨痕", "mohen"}, priority=5)
 # 阻塞：阻止不同机器人之间无限递归，也可以当成黑名单用
 blocker = on_message(priority=1, block=False)
-add_blocker = on_command("block", rule=to_me)
-remove_blocker = on_command("unblock", rule=to_me)
-print_blocker = on_command("blocklist", rule=to_me)
+add_blocker = on_command("block", rule=to_me, priority=5)
+remove_blocker = on_command("unblock", rule=to_me, priority=5)
+print_blocker = on_command("blocklist", rule=to_me, priority=5)
 
 # 启动时加载
 @get_driver().on_startup
 async def on_startup():
     log.logger.debug(f"阻塞名单: {BLOCKLIST}")
+
+@get_driver().on_shutdown
+async def on_shutdown():
+    # TODO: 保存配置
+    pass
 
 @ping_checker.handle()
 async def checker_func():
