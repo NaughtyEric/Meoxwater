@@ -1,3 +1,6 @@
+import os
+import sys
+
 from nonebot import get_driver, log, Bot
 from nonebot import on_keyword, on_command, on_message
 from nonebot.adapters.onebot.v11 import MessageEvent
@@ -21,6 +24,7 @@ blocker = on_message(priority=1, block=False)
 add_blocker = on_command("block", rule=to_me, priority=5)
 remove_blocker = on_command("unblock", rule=to_me, priority=5)
 print_blocker = on_command("blocklist", rule=to_me, priority=5)
+reboot = on_command("reboot", rule=to_me, priority=5)
 
 # 启动时加载
 @get_driver().on_startup
@@ -91,3 +95,11 @@ async def print_blocker_func(bot: Bot, message: MessageEvent):
 @mohen_checker.handle()
 async def mohen_checker_func():
     await mohen_checker.finish("墨痕縩篳！")
+
+@reboot.handle()
+async def reboot_func(bot: Bot, message: MessageEvent):
+    if message.sender.user_id in ADMIN:
+        await reboot.send("正在重启...")
+        os.execv(sys.executable, ['nb', 'run'])
+    else:
+        await reboot.finish("你没有权限重启。")
