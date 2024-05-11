@@ -42,7 +42,7 @@ async def caramel(bot, event: GroupMessageEvent):
                 with open(f"{path}/caramel/{file}", "r") as f:
                     await caramel_event.finish(f.read())
             await caramel_event.finish(f"喵呜？第{rnd}条内容存在问题！")
-        await caramel_event.finish(f"咿呀！图片不存在喵！")
+        await caramel_event.finish(f"咿呀！第{rnd}条内容不存在喵！")
 
 
 
