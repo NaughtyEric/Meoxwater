@@ -98,8 +98,9 @@ async def mohen_checker_func():
 
 @reboot.handle()
 async def reboot_func(bot: Bot, message: MessageEvent):
-    if message.sender.user_id in ADMIN:
-        await reboot.send("正在重启...")
-        os.execv(sys.executable, ['nb', 'run'])
-    else:
-        await reboot.finish("你没有权限重启。")
+    # if message.sender.user_id in ADMIN:
+    #     await bot.send_private_msg(user_id=message.sender.user_id, message="正在重启...")
+    #
+    # else:
+    #     await reboot.finish("你没有权限重启。")
+    pass
