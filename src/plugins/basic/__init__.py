@@ -43,7 +43,7 @@ async def checker_func():
 @blocker.handle()
 async def _(message: MessageEvent, matcher: Matcher):
     if message.sender.user_id in BLOCKLIST:
-        log.logger.debug(f"已被阻塞的消息: {message.get_plaintext()}")
+        log.logger.info(f"已被阻塞的消息: {message.get_plaintext()}")
         matcher.stop_propagation()
     else:
         log.logger.debug(f"未被阻塞的消息: {message.get_plaintext()}")
