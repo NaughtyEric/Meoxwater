@@ -48,7 +48,7 @@ async def caramel(bot, event: GroupMessageEvent):
             await caramel_event.finish(MessageSegment.image(f"file:///{path}/caramel/{file}"))
         elif ext.lower() in ["txt"]:
             with open(f"{path}/caramel/{file}", "r") as f:
-                await caramel_event.finish(f.read())
+                await caramel_event.finish(f.read().strip('\n'))
         await caramel_event.finish("喵呜？内容存在问题！")
 
 
@@ -63,6 +63,6 @@ async def fb(bot, event: GroupMessageEvent):
             await fb_event.finish(MessageSegment.image(f"file:///{path}/fb/{file}"))
         elif ext.lower() in ["txt"]:
             with open(f"{path}/fb/{file}", "r") as f:
-                await fb_event.finish(f.read())
+                await fb_event.finish(f.read().strip('\n'))
         await fb_event.finish("喵呜？内容存在问题！")
 
