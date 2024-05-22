@@ -7,7 +7,6 @@ from nonebot.adapters.onebot.v11 import MessageEvent
 from nonebot.matcher import Matcher
 from nonebot.rule import to_me
 from .config import Config
-
 import re
 
 global_config = get_driver().config

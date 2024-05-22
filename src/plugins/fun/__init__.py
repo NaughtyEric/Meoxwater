@@ -1,8 +1,10 @@
 # 花里胡哨的东西想到了就加进来
+import logging
+
 import nonebot.adapters
-from nonebot import on_keyword, on_command, get_driver
-from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent
-from nonebot.config import Config
+from nonebot import on_keyword, on_command, get_driver, on_metaevent
+from nonebot.adapters.mirai2 import MessageSegment
+from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, Message, PokeNotifyEvent
 from nonebot.exception import MatcherException
 from nonebot.params import CommandArg
 import time
@@ -13,6 +15,8 @@ global_config = get_driver().config
 good_night = on_keyword({'晚安', '晚安啦', '晚安了'}, priority=5)
 good_morning = on_keyword({'早上好', '早安'}, priority=5)
 sleep_immediately = on_command('睡觉', aliases={'sleep'}, priority=5)
+# repeater = on_message(priority=10)
+poke_poke = on_metaevent(block=True, priority=5)
 IGNORE = []
 
 def add_ignore(user_id: int):
@@ -85,3 +89,12 @@ async def _(bot: Bot, event, message: nonebot.adapters.Message = CommandArg()):
                 raise
             except Exception as e:
                 await sleep_immediately.finish(f'好的，晚安喵~\nTips: /sleep <时长>获取深度睡眠。')
+
+# @poke_poke.handle()
+# async def _(bot: Bot, event: NudgeEvent):
+#     sender = event.from_id
+#     nonebot.logger.debug(f"poke_poke: {event.target}")
+#     if sender != event.target and event.target == int(bot.self_id):
+#         await poke_poke.finish(Message([MessageSegment(MessageSegment.type.POKE, {"qq": sender})]))
+#     else:
+#         await poke_poke.finish()
