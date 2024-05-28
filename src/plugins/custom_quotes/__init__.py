@@ -20,8 +20,8 @@ config = Config.parse_obj(global_config)
 
 path = global_config.quote_path
 
-caramel_event = on_fullmatch(("焦糖", "caramel"), priority=5, ignorecase=True)
-fb_event = on_fullmatch("发病", priority=5, ignorecase=True)
+caramel_event = on_fullmatch(("焦糖", "caramel"), priority=10, ignorecase=True)
+fb_event = on_fullmatch("发病", priority=10, ignorecase=True)
 
 # submit = on_command("submit", priority=5)
 
