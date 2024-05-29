@@ -11,7 +11,8 @@ adapters = [
     { name = "OneBot V12", module_name = "nonebot.adapters.onebot.v12" },
     { name = "Console", module_name = "nonebot.adapters.console" },
     { name = "Minecraft", module_name = "nonebot.adapters.minecraft" },
-    {name = "OneBot V11", module_name = "nonebot.adapters.onebot.v11"}
+    { name = "OneBot V11", module_name = "nonebot.adapters.onebot.v11"},
+    { name = "Mirai", module_name = "nonebot.adapters.mirai"}
 ]
 plugins = ["nonebot_plugin_batitle"]
 plugin_dirs = ["src/plugins"]

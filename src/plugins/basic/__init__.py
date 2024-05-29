@@ -1,9 +1,11 @@
 import os
 import sys
 
+import nonebot.adapters.mirai2
 from nonebot import get_driver, log, Bot
 from nonebot import on_keyword, on_command, on_message
 from nonebot.adapters.onebot.v11 import MessageEvent
+import nonebot.adapters.mirai as mirai
 from nonebot.matcher import Matcher
 from nonebot.rule import to_me
 from .config import Config
@@ -24,6 +26,7 @@ add_blocker = on_command("block", rule=to_me, priority=5)
 remove_blocker = on_command("unblock", rule=to_me, priority=5)
 print_blocker = on_command("blocklist", rule=to_me, priority=5)
 reboot = on_command("reboot", rule=to_me, priority=5)
+send_temp_msg = on_command("私发", rule=to_me, priority=5)
 
 # 启动时加载
 @get_driver().on_startup
@@ -102,4 +105,9 @@ async def reboot_func(bot: Bot, message: MessageEvent):
     #
     # else:
     #     await reboot.finish("你没有权限重启。")
+    pass
+
+@send_temp_msg.handle()
+async def send_temp_msg_func(bot: nonebot.adapters.onebot.v11.Bot, message: nonebot.adapters.onebot.v11.GroupMessageEvent):
+    # await bot.send_temp_message(group=message.group_id, target=int(message.sender.user_id), message="测试私发消息")
     pass

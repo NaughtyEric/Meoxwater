@@ -1,11 +1,13 @@
 # 从.env中读取mysql配置，链接数据库
+import nonebot.adapters
 from nonebot.matcher import Matcher
 from nonebot.internal.params import ArgPlainText
 from nonebot.params import CommandArg
 
 from .database import Database
-from nonebot import get_driver, logger, on_command
-from nonebot.adapters.onebot.v11 import Bot, Event, Message
+from nonebot import get_driver, logger, on_command, on_message
+from nonebot.adapters.onebot.v11 import Bot, MessageEvent, Message
+import nonebot.adapters.mirai as mirai
 
 global_config = get_driver().config
 MYSQL_URL = None
@@ -14,6 +16,11 @@ MYSQL_PASSWORD = None
 DB = Database()
 
 caramel_cup = on_command("ccup", priority=5)
+
+temp_mute = on_command("ccup", priority=2, block=True)
+@temp_mute.handle()
+async def _(bot: Bot, event: MessageEvent):
+    await temp_mute.finish()  # 暂时禁用焦糖杯插件
 
 
 @get_driver().on_startup
@@ -52,12 +59,14 @@ async def on_shutdown():
 
 @caramel_cup.handle()
 async def _(matcher: Matcher, args: Message = CommandArg()):
+    logger.debug("step 1")
     if args.extract_plain_text():
         matcher.set_arg("operation", args)
 
 
 @caramel_cup.got("operation", prompt="请问你需要我帮你做什么呢？")
-async def _(bot: Bot, event: Event, operation: str = ArgPlainText()):
+async def _(bot: Bot, event: MessageEvent, operation: str = ArgPlainText()):
+    logger.debug(f"operation: {operation}")
     global DB
     if not DB:
         await caramel_cup.finish("焦糖杯相关插件加载失败，请联系管理员。")
@@ -76,21 +85,23 @@ async def _(bot: Bot, event: Event, operation: str = ArgPlainText()):
             await caramel_cup.pause("你已经在注册流程中了。是否需要重置captcha？发送“是”以确认，发送其他内容以取消。")
         else:
             try:
-                await bot.send_private_msg(user_id=int(event.get_user_id()),
-                                           message=f"您的captcha是：\n{DB.gen_captcha(event.get_user_id(), check_if_in_register_procedure)}\n"
-                                                   f"\n请登录焦糖杯网站进行注册。")
+                message = f"您的captcha是：\n{DB.gen_captcha(event.get_user_id(), False)}\n请登录焦糖杯网站进行注册。"
+                await bot.send_temp_message(group=event.group_id, target=int(event.get_user_id()), message=message)
             except Exception as e:
                 logger.error(f"发送私聊消息失败: {e}")
+                DB.rollback()
                 await caramel_cup.finish("发送私聊消息失败。")
             else:
+                DB.commit()
                 await caramel_cup.finish("为你发送了一条私聊消息，请查收。")
     else:
         await caramel_cup.finish("不支持的操作。")
 
 
 @caramel_cup.handle()
-async def _(bot: Bot, event: Event, message: Message):
-    if message.extract_plain_text() == "是":
+async def _(bot: mirai.Bot, event: MessageEvent):
+    logger.debug("step 3")
+    if event.message.extract_plain_text() == "是":
         await bot.send_private_msg(user_id=int(event.get_user_id()),
                                    message=f"您的captcha是：\n{DB.gen_captcha(event.get_user_id(), True)}\n"
                                            f"\n请登录焦糖杯网站进行注册。")

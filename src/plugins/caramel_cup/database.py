@@ -15,6 +15,11 @@ def _gen_verification_code(length=9):
 
 class Database:
     def __init__(self, url=None, port=3306, user='root', password='root', database='caramel'):
+        self.url = url
+        self.port = port
+        self.user = user
+        self.password = password
+        self.database = database
         if not url:
             self.db = None
             self.cursor = None
@@ -32,9 +37,23 @@ class Database:
         if self.db:
             self.db.close()
 
-    def execute(self, sql, args=None):
-        self.cursor.execute(sql, args)
-        return self.cursor.fetchall()
+    def reconnect(self):
+        """重新连接数据库"""
+        self.db = pymysql.connect(host=self.url, port=self.port, user=self.user,
+                                  password=self.password, database=self.database)
+        self.cursor = self.db.cursor()
+
+    def execute(self, sql, args=None, reties=3):
+        if not self.cursor:
+            self.reconnect()
+        for _ in range(reties):
+            try:
+                self.cursor.execute(sql, args)
+                return
+            except Exception as e:
+                self.reconnect()
+                continue
+        raise Exception("数据库连接失败，重试次数：{}".format(reties))
 
     def commit(self):
         self.db.commit()
@@ -49,12 +68,11 @@ class Database:
         if already_in_procedure:
             # 如果用户已经存在，更新验证码
             self.execute("UPDATE participant SET captcha = %s, expires = NOW() + INTERVAL 5 MINUTE WHERE qid = %s",
-                            (captcha, user_id))
+                         (captcha, user_id))
         # 将验证码插入数据库
         else:
             self.execute("INSERT INTO participant (qid, captcha, expires) VALUES (%s, %s, NOW() + INTERVAL 20 MINUTE)",
-                        (user_id, captcha))
-        self.commit()
+                         (user_id, captcha))
         return captcha
 
     def rollback(self):
