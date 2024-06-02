@@ -2,7 +2,7 @@ import os
 import sys
 
 import nonebot.adapters.mirai2
-from nonebot import get_driver, log, Bot
+from nonebot import get_driver, log, Bot, on_fullmatch
 from nonebot import on_keyword, on_command, on_message
 from nonebot.adapters.onebot.v11 import MessageEvent
 import nonebot.adapters.mirai as mirai
@@ -19,7 +19,7 @@ ADMIN = global_config.admin
 # 检测是否在线
 ping_checker = on_command("ping", aliases={"测试"}, rule=to_me, priority=5)
 # 墨痕縩篳：测试寄气人在线性
-mohen_checker = on_keyword({"墨痕", "mohen"}, priority=5)
+mohen_checker = on_fullmatch(("墨痕", "mohen"), priority=5)
 # 阻塞：阻止不同机器人之间无限递归，也可以当成黑名单用
 blocker = on_message(priority=1, block=False)
 add_blocker = on_command("block", rule=to_me, priority=5)
@@ -28,19 +28,23 @@ print_blocker = on_command("blocklist", rule=to_me, priority=5)
 reboot = on_command("reboot", rule=to_me, priority=5)
 send_temp_msg = on_command("私发", rule=to_me, priority=5)
 
+
 # 启动时加载
 @get_driver().on_startup
 async def on_startup():
     log.logger.debug(f"阻塞名单: {BLOCKLIST}")
+
 
 @get_driver().on_shutdown
 async def on_shutdown():
     # TODO: 保存配置
     pass
 
+
 @ping_checker.handle()
 async def checker_func():
     await ping_checker.finish("pong!")
+
 
 @blocker.handle()
 async def _(message: MessageEvent, matcher: Matcher):
@@ -51,13 +55,15 @@ async def _(message: MessageEvent, matcher: Matcher):
         log.logger.debug(f"未被阻塞的消息: {message.get_plaintext()}")
         matcher.skip()
 
+
 @add_blocker.handle()
 async def add_blocker_func(bot: Bot, message: MessageEvent):
     # 查找是否@了人
     sender = message.sender.user_id
     at_list = re.findall(r"\[CQ:at,qq=(\d+)]", message.raw_message)
     at_list = [int(at) for at in at_list if
-               (int(at) != sender and int(at) not in BLOCKLIST and int(at) not in ADMIN and int(at) != int(bot.self_id))]
+               (int(at) != sender and int(at) not in BLOCKLIST and int(at) not in ADMIN and int(at) != int(
+                   bot.self_id))]
     if at_list:
         BLOCKLIST.extend(at_list)
         # 刷新配置
@@ -65,6 +71,7 @@ async def add_blocker_func(bot: Bot, message: MessageEvent):
         await add_blocker.finish(f"已将{str(at_list).strip('[]')}加入阻塞名单。")
     else:
         await add_blocker.finish("请@要加入阻塞名单的人。不能将自己或已被阻塞的人加入阻塞名单。")
+
 
 @remove_blocker.handle()
 async def remove_blocker_func(message: MessageEvent):
@@ -93,10 +100,10 @@ async def print_blocker_func(bot: Bot, message: MessageEvent):
         await print_blocker.finish("你没有权限查看阻塞名单。")
 
 
-
 @mohen_checker.handle()
 async def mohen_checker_func():
     await mohen_checker.finish("墨痕縩篳！")
+
 
 @reboot.handle()
 async def reboot_func(bot: Bot, message: MessageEvent):
@@ -107,7 +114,9 @@ async def reboot_func(bot: Bot, message: MessageEvent):
     #     await reboot.finish("你没有权限重启。")
     pass
 
+
 @send_temp_msg.handle()
-async def send_temp_msg_func(bot: nonebot.adapters.onebot.v11.Bot, message: nonebot.adapters.onebot.v11.GroupMessageEvent):
+async def send_temp_msg_func(bot: nonebot.adapters.onebot.v11.Bot,
+                             message: nonebot.adapters.onebot.v11.GroupMessageEvent):
     # await bot.send_temp_message(group=message.group_id, target=int(message.sender.user_id), message="测试私发消息")
     pass
