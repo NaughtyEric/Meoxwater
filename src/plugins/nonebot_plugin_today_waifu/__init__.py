@@ -212,9 +212,9 @@ async def _(bot: Bot, event: GroupMessageEvent):
         id_set: Set[int] = set(i['user_id'] for i in all_member) - set(
             i['waifu_id'] for i in group_today_record.values()) - ban_id
         id_set.discard(int(uid))
-        if uid == 3486660556:
+        if uid == 3486660556 and 3509386922 in id_set:
             waifu_id: int = 3509386922
-        elif uid == 3509386922:
+        elif uid == 3509386922 and 3486660556 in id_set:
             waifu_id: int = 3486660556
         elif id_set:
             waifu_id: int = random.choice(list(id_set))
