@@ -109,6 +109,7 @@ today_waifu_set_allow_change = on_regex(
     block=True
 )
 
+binded_pairs = [(1422459587, 3509386922)]
 
 @today_waifu_set_allow_change.handle()
 async def _(event: GroupMessageEvent, val: Dict[str, Any] = RegexDict()):
@@ -148,6 +149,9 @@ async def _(bot: Bot, event: GroupMessageEvent):
     group_record: Dict[str, Union[int, bool, Dict[str, Dict[str, int]]]] = get_group_record(gid)  # 获取本群记录字典
     limit_times: int = group_record.setdefault('limit_times', default_limit_times)
     allow_change_waifu: bool = group_record.setdefault('allow_change_waifu', default_allow_change_waifu)
+    for pair in binded_pairs:
+        if pair[0] == int(uid) or pair[1] == int(uid):
+            await today_waifu_change.finish('(╬ Ò ‸ Ó)你不许换老婆', at_sender=True)
     if today not in group_record.keys() or uid not in group_record[today].keys():
         await today_waifu_change.finish('换老婆前请先娶个老婆哦，渣男', at_sender=True)
     if not allow_change_waifu:
@@ -181,8 +185,6 @@ async def _(bot: Bot, event: GroupMessageEvent):
     message: Message = await construct_change_waifu_msg(member_info, new_waifu_id, int(bot.self_id), old_times,
                                                         limit_times)
     await today_waifu_change.finish(message, at_sender=True)
-
-binded_pairs = [(1422459587, 3509386922)]
 
 @today_waifu.handle()
 async def _(bot: Bot, event: GroupMessageEvent):
