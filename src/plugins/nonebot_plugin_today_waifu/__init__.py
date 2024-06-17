@@ -182,6 +182,7 @@ async def _(bot: Bot, event: GroupMessageEvent):
                                                         limit_times)
     await today_waifu_change.finish(message, at_sender=True)
 
+binded_pairs = [(1422459587, 3509386922)]
 
 @today_waifu.handle()
 async def _(bot: Bot, event: GroupMessageEvent):
@@ -212,15 +213,23 @@ async def _(bot: Bot, event: GroupMessageEvent):
         id_set: Set[int] = set(i['user_id'] for i in all_member) - set(
             i['waifu_id'] for i in group_today_record.values()) - ban_id
         id_set.discard(int(uid))
-        if uid == "3486660556" and 3509386922 in id_set:
-            waifu_id: int = 3509386922
-        elif uid == "3509386922" and 3486660556 in id_set:
-            waifu_id: int = 3486660556
-        elif id_set:
-            waifu_id: int = random.choice(list(id_set))
-        else:
-            # 如果剩余群员列表为空，默认机器人作为老婆
-            waifu_id: int = int(bot.self_id)
+        binded = False
+        waifu_id = -1
+        for pair in binded_pairs:
+            if pair[0] == int(uid):
+                waifu_id = pair[1]
+                binded = True
+                break
+            if pair[1] == int(uid):
+                waifu_id = pair[0]
+                binded = True
+                break
+        if not binded:
+            if id_set:
+                waifu_id: int = random.choice(list(id_set))
+            else:
+                # 如果剩余群员列表为空，默认机器人作为老婆
+                waifu_id: int = int(bot.self_id)
         group_today_record[uid] = {
             'waifu_id': waifu_id,
             'times': 0,
