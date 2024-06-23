@@ -148,7 +148,7 @@ async def _(bot: Bot, event: GroupMessageEvent):
     group_record: Dict[str, Union[int, bool, Dict[str, Dict[str, int]]]] = get_group_record(gid)  # 获取本群记录字典
     limit_times: int = group_record.setdefault('limit_times', default_limit_times)
     allow_change_waifu: bool = group_record.setdefault('allow_change_waifu', default_allow_change_waifu)
-    if uid == "3486660556" or uid == "3509386922":
+    if uid == "3486660556" or uid == "3509386922" or uid == "2765024252" or uid == "2112611676":
         await today_waifu_change.finish('(╬ Ò ‸ Ó)你不许换老婆', at_sender=True)
     if today not in group_record.keys() or uid not in group_record[today].keys():
         await today_waifu_change.finish('换老婆前请先娶个老婆哦，渣男', at_sender=True)
@@ -218,6 +218,10 @@ async def _(bot: Bot, event: GroupMessageEvent):
             waifu_id: int = 3509386922
         elif uid == "3509386922" and 3486660556 in id_set:
             waifu_id: int = 3486660556
+        elif uid == "2765024252" and 2112611676 in id_set:
+            waifu_id: int = 2112611676
+        elif uid == "2112611676" and 2765024252 in id_set:
+            waifu_id: int = 2765024252
         elif id_set:
             waifu_id: int = random.choice(list(id_set))
         else:
