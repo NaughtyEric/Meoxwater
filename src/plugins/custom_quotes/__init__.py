@@ -22,6 +22,7 @@ path = global_config.quote_path
 
 caramel_event = on_fullmatch(("焦糖", "caramel"), priority=10, ignorecase=True)
 fb_event = on_fullmatch("发病", priority=10, ignorecase=True)
+trioxwater_event = on_fullmatch(("三氧水", "trioxwater", "三氧", "三氧猫"), priority=10, ignorecase=True)
 
 # submit = on_command("submit", priority=5)
 
@@ -66,3 +67,16 @@ async def fb(bot, event: GroupMessageEvent):
                 await fb_event.finish(f.read().strip('\n'))
         await fb_event.finish("喵呜？内容存在问题！")
 
+@trioxwater_event.handle()
+async def trioxwater(bot, event: GroupMessageEvent):
+    try:
+        file, ext = common(657148784, "/trioxwater", event)
+    except:
+        await trioxwater_event.finish("喵呜？内容不存在喵！")
+    else:
+        if ext.lower() in ["jpg", "jpeg", "png", "gif", "bmp"]:
+            await trioxwater_event.finish(MessageSegment.image(f"file:///{path}/trioxwater/{file}"))
+        elif ext.lower() in ["txt"]:
+            with open(f"{path}/trioxwater/{file}", "r") as f:
+                await trioxwater_event.finish(f.read().strip('\n'))
+        await trioxwater_event.finish("喵呜？内容存在问题！")
