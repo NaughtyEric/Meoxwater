@@ -1,5 +1,6 @@
 # 花里胡哨的东西想到了就加进来
 import logging
+from random import random
 
 import nonebot.adapters
 from nonebot import on_keyword, on_command, get_driver, on_fullmatch
@@ -34,6 +35,7 @@ async def _(bot, event: GroupMessageEvent):
     t = time.localtime()
     sender = event.sender.user_id
     remove_ignore()
+    # 屏蔽模块：阻止bot对单一用户的重复回复
     if sender in [i[0] for i in IGNORE]:
         return
     add_ignore(sender)
@@ -57,6 +59,9 @@ async def _(bot, event: GroupMessageEvent):
     if 5 <= t.tm_hour < 10:
         await good_morning.finish('早上好，新的一天也要活力满满喵~')
     elif 10 <= t.tm_hour < 17:
+        if random() < 0.2:
+            await good_morning.finish('起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢'
+                                      '起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢')
         await good_morning.finish('（戳表）这都几点了喵！还在早安？起床，起床喵！')
     else:
         await good_morning.finish('早上好……喵？（陷入思考）（死机）')
