@@ -1,5 +1,7 @@
 # 花里胡哨的东西想到了就加进来
 import logging
+from asyncio import sleep
+from cgitb import enable
 from random import random
 
 import nonebot.adapters
@@ -10,17 +12,25 @@ from nonebot.params import CommandArg
 import time
 import datetime
 
+from nonebot import require
+
+require("nonebot_plugin_apscheduler")
+from nonebot_plugin_apscheduler import scheduler
+
 global_config = get_driver().config
 
 good_night = on_fullmatch(('晚安', '晚安啦', '晚安了'), priority=5)
 good_morning = on_fullmatch(('早上好', '早安', '早'), priority=5)
 sleep_immediately = on_command('睡觉', aliases={'sleep'}, priority=5)
+silent = on_command('silent', priority=5)
 # repeater = on_message(priority=10)
 # poke_poke = on_metaevent(block=True, priority=5)
 IGNORE = []
 
+
 def add_ignore(user_id: int):
     IGNORE.append((user_id, time.time()))
+
 
 def remove_ignore():
     # CD 5分钟
@@ -48,6 +58,7 @@ async def _(bot, event: GroupMessageEvent):
     else:
         await good_night.finish('啊……呃，晚安……喵？')
 
+
 @good_morning.handle()
 async def _(bot, event: GroupMessageEvent):
     t = time.localtime()
@@ -57,11 +68,11 @@ async def _(bot, event: GroupMessageEvent):
         return
     add_ignore(sender)
     if 5 <= t.tm_hour < 10:
-        await good_morning.finish('早上好，新的一天也要活力满满喵~')
-    elif 10 <= t.tm_hour < 17:
         if random() < 0.2:
             await good_morning.finish('起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢'
                                       '起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢')
+        await good_morning.finish('早上好，新的一天也要活力满满喵~')
+    elif 10 <= t.tm_hour < 17:
         await good_morning.finish('（戳表）这都几点了喵！还在早安？起床，起床喵！')
     else:
         await good_morning.finish('早上好……喵？（陷入思考）（死机）')
@@ -94,6 +105,7 @@ async def _(bot: Bot, event, message: nonebot.adapters.Message = CommandArg()):
             except Exception as e:
                 await sleep_immediately.finish(f'好的，晚安喵~\nTips: /sleep <时长>获取深度睡眠。')
 
+
 # @poke_poke.handle()
 # async def _(bot: Bot, event: NudgeEvent):
 #     sender = event.from_id
@@ -102,3 +114,24 @@ async def _(bot: Bot, event, message: nonebot.adapters.Message = CommandArg()):
 #         await poke_poke.finish(Message([MessageSegment(MessageSegment.type.POKE, {"qq": sender})]))
 #     else:
 #         await poke_poke.finish()
+
+@silent.handle()
+async def _(bot: Bot, event, message: nonebot.adapters.Message = CommandArg()):
+    WHITELIST = global_config.whitelist
+    if isinstance(event, GroupMessageEvent):
+        sender = event.sender.user_id
+        if sender in WHITELIST:
+            msg = message.extract_plain_text()
+            try:
+                time_length = float(msg)
+                if time_length <= 0:
+                    await silent.finish('禁言时长必须大于0。')
+                # 转换为秒
+                scd = int(time_length * 60)
+                await bot.set_group_whole_ban(group_id=event.group_id, enable=True)
+                await sleep(scd)
+                await bot.set_group_whole_ban(group_id=event.group_id, enable=False)
+            except ValueError:
+                await silent.finish('请指定禁言时长。')
+        else:
+            await silent.finish('你没有权限使用此命令。')
