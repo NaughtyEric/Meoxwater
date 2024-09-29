@@ -6,11 +6,14 @@ import httpx
 def remove_a_pair(d: dict, key: int):
     """
     从dict中移除相对应的一对。即：若成功移除了key->val，则同时移除val->key。
+    :return: 移除成功返回True，否则返回False
     """
     if key in d.keys():
         val = d[key]
         d.pop(key)
         d.pop(val)
+        return True
+    return False
 
 
 """
