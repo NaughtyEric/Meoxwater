@@ -1,8 +1,7 @@
 # 花里胡哨的东西想到了就加进来
 import logging
 from asyncio import sleep
-from cgitb import enable
-from random import random
+from random import random, sample
 
 import nonebot.adapters
 from nonebot import on_keyword, on_command, get_driver, on_fullmatch
@@ -40,6 +39,20 @@ def remove_ignore():
             break
 
 
+GOOD_NIGHT_WORDS = [
+    ['晚安喵，愿你的梦境不受梦魇侵扰~', '晚安喵，做个好梦~', '快去睡觉吧，喵喵'],
+    ['把细碎的烦恼暂时关掉，把月亮挂好睡个好觉。虽然已经夜深人静，还是要祝你做个好梦喵~', '唔……已经这么晚了喵，快睡觉吧，晚安喵喵~',
+     '（打呵欠）好晚了呃啊……晚安喵……（睡着）'],
+    ['啊……呃……晚安喵？', '（猫娘没有回复，也许她并不能理解为什么有人要现在和她说晚安？）', '（不可置信地看表，发出困惑的喵喵声）']
+]
+GOOD_MOENING_WORDS = [
+    ['起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて'
+     '📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢', '早上好，新的一天也要活力满满喵~', '早上好，新的一天开始了喵~'],
+    ['（戳表）这都几点了喵！还在早安？起床，起床喵！', '（嫌弃脸）你这个懒猫，起床啦！（掀被子）', '起床！起床！（拍拍）'],
+    ['早上好……喵？（陷入思考）（死机）', '（猫娘没有回复，也许她并不能理解为什么有人要现在和她说早上好？）', '（不可置信地看表，发出困惑的喵喵声）']
+]
+
+
 @good_night.handle()
 async def _(bot, event: GroupMessageEvent):
     t = time.localtime()
@@ -49,14 +62,15 @@ async def _(bot, event: GroupMessageEvent):
     if sender in [i[0] for i in IGNORE]:
         return
     add_ignore(sender)
-    # 如果是在晚上十点到十二点之间，就回复晚安
-    if 22 <= t.tm_hour < 24:
-        await good_night.finish('晚安喵，愿你的梦境不受梦魇侵扰~')
-    # 如果是在凌晨0点到6点之间，就回复晚安
-    elif 0 <= t.tm_hour < 6:
-        await good_night.finish('把细碎的烦恼暂时关掉，把月亮挂好睡个好觉。虽然已经夜深人静，还是要祝你做个好梦喵~')
+    global GOOD_NIGHT_WORDS
+    # 如果是在晚上八点到十二点之间，就回复晚安
+    if 20 <= t.tm_hour < 24:
+        await good_night.finish(sample(GOOD_NIGHT_WORDS[0], 1)[0])
+    # 如果是在凌晨0点到5点之间，就回复晚安
+    elif 0 <= t.tm_hour < 5:
+        await good_night.finish(sample(GOOD_NIGHT_WORDS[1], 1)[0])
     else:
-        await good_night.finish('啊……呃，晚安……喵？')
+        await good_night.finish(sample(GOOD_NIGHT_WORDS[2], 1)[0])
 
 
 @good_morning.handle()
@@ -67,15 +81,13 @@ async def _(bot, event: GroupMessageEvent):
     if sender in [i[0] for i in IGNORE]:
         return
     add_ignore(sender)
+    global GOOD_MOENING_WORDS
     if 5 <= t.tm_hour < 10:
-        if random() < 0.2:
-            await good_morning.finish('起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢'
-                                      '起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢起きて📢')
-        await good_morning.finish('早上好，新的一天也要活力满满喵~')
+        await good_morning.finish(sample(GOOD_MOENING_WORDS[0], 1)[0])
     elif 10 <= t.tm_hour < 17:
-        await good_morning.finish('（戳表）这都几点了喵！还在早安？起床，起床喵！')
+        await good_morning.finish(sample(GOOD_MOENING_WORDS[1], 1)[0])
     else:
-        await good_morning.finish('早上好……喵？（陷入思考）（死机）')
+        await good_morning.finish(sample(GOOD_MOENING_WORDS[2], 1)[0])
 
 
 @sleep_immediately.handle()
