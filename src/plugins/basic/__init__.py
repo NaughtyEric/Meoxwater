@@ -1,6 +1,3 @@
-import os
-import sys
-
 import nonebot.adapters.mirai2
 from nonebot import get_driver, log, Bot, on_fullmatch
 from nonebot import on_keyword, on_command, on_message
@@ -18,8 +15,6 @@ ADMIN = global_config.admin
 
 # 检测是否在线
 ping_checker = on_command("ping", aliases={"测试"}, rule=to_me, priority=5)
-# 墨痕縩篳：测试寄气人在线性
-mohen_checker = on_fullmatch(("墨痕", "mohen"), priority=5)
 # 阻塞：阻止不同机器人之间无限递归，也可以当成黑名单用
 blocker = on_message(priority=1, block=False)
 add_blocker = on_command("block", rule=to_me, priority=5)
@@ -99,10 +94,6 @@ async def print_blocker_func(bot: Bot, message: MessageEvent):
     else:
         await print_blocker.finish("你没有权限查看阻塞名单。")
 
-
-@mohen_checker.handle()
-async def mohen_checker_func():
-    await mohen_checker.finish("墨痕縩篳！")
 
 
 @reboot.handle()
