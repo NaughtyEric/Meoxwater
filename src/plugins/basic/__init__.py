@@ -98,11 +98,7 @@ async def print_blocker_func(bot: Bot, message: MessageEvent):
 
 @reboot.handle()
 async def reboot_func(bot: Bot, message: MessageEvent):
-    # if message.sender.user_id in ADMIN:
-    #     await bot.send_private_msg(user_id=message.sender.user_id, message="正在重启...")
-    #
-    # else:
-    #     await reboot.finish("你没有权限重启。")
+
     pass
 
 
