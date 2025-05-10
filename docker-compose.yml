@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  triox-bot:
+    build: .
+    container_name: triox-bot
+    volumes:
+      - .:/app
+      - ./.venv:/app/.venv
+    networks:
+      - triox-net
+    restart: unless-stopped
+    tty: true
+
+networks:
+  triox-net:
+    external: true
