@@ -1,27 +1,23 @@
-import nonebot.adapters.mirai2
-from nonebot import get_driver, log, Bot, on_fullmatch
-from nonebot import on_keyword, on_command, on_message
+import re
+from nonebot import get_driver, log, Bot
+from nonebot import on_command, on_message
 from nonebot.adapters.onebot.v11 import MessageEvent
-import nonebot.adapters.mirai as mirai
 from nonebot.matcher import Matcher
 from nonebot.rule import to_me
-from .config import Config
-import re
 
 global_config = get_driver().config
-config = Config.parse_obj(global_config)
 BLOCKLIST = global_config.blocklist
 ADMIN = global_config.admin
 
 # 检测是否在线
-ping_checker = on_command("ping", aliases={"测试"}, rule=to_me, priority=5)
+ping_checker = on_command("ping", aliases={"测试"}, rule=to_me(), priority=5)
 # 阻塞：阻止不同机器人之间无限递归，也可以当成黑名单用
 blocker = on_message(priority=1, block=False)
-add_blocker = on_command("block", rule=to_me, priority=5)
-remove_blocker = on_command("unblock", rule=to_me, priority=5)
-print_blocker = on_command("blocklist", rule=to_me, priority=5)
-reboot = on_command("reboot", rule=to_me, priority=5)
-send_temp_msg = on_command("私发", rule=to_me, priority=5)
+add_blocker = on_command("block", rule=to_me(), priority=5)
+remove_blocker = on_command("unblock", rule=to_me(), priority=5)
+print_blocker = on_command("blocklist", rule=to_me(), priority=5)
+reboot = on_command("reboot", rule=to_me(), priority=5)
+send_temp_msg = on_command("私发", rule=to_me(), priority=5)
 
 
 # 启动时加载
@@ -50,7 +46,7 @@ async def _(message: MessageEvent, matcher: Matcher):
         log.logger.debug(f"未被阻塞的消息: {message.get_plaintext()}")
         matcher.skip()
 
-
+"""
 @add_blocker.handle()
 async def add_blocker_func(bot: Bot, message: MessageEvent):
     # 查找是否@了人
@@ -95,15 +91,7 @@ async def print_blocker_func(bot: Bot, message: MessageEvent):
         await print_blocker.finish("你没有权限查看阻塞名单。")
 
 
-
 @reboot.handle()
 async def reboot_func(bot: Bot, message: MessageEvent):
-
     pass
-
-
-@send_temp_msg.handle()
-async def send_temp_msg_func(bot: nonebot.adapters.onebot.v11.Bot,
-                             message: nonebot.adapters.onebot.v11.GroupMessageEvent):
-    # await bot.send_temp_message(group=message.group_id, target=int(message.sender.user_id), message="测试私发消息")
-    pass
+"""
