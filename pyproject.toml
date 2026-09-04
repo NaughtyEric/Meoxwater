@@ -1,0 +1,14 @@
+[project]
+name = "meoxwater"
+version = "0.1.0"
+description = "triox-bot: NoneBot2 QQ bot"
+requires-python = ">=3.10"
+
+[tool.nonebot]
+adapters = [
+    { name = "OneBot V11", module_name = "nonebot.adapters.onebot.v11" },
+    { name = "Minecraft", module_name = "nonebot.adapters.minecraft" },
+]
+plugins = []
+plugin_dirs = ["src/plugins"]
+builtin_plugins = []
