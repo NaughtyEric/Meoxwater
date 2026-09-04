@@ -1,8 +1,10 @@
+import os
 import re
 from nonebot import get_driver, log, Bot
 from nonebot import on_command, on_message
 from nonebot.adapters.onebot.v11 import MessageEvent
 from nonebot.matcher import Matcher
+from nonebot.permission import SUPERUSER
 from nonebot.rule import to_me
 
 global_config = get_driver().config
@@ -13,11 +15,12 @@ ADMIN = global_config.admin
 ping_checker = on_command("ping", aliases={"测试"}, rule=to_me(), priority=5)
 # 阻塞：阻止不同机器人之间无限递归，也可以当成黑名单用
 blocker = on_message(priority=1, block=False)
-add_blocker = on_command("block", rule=to_me(), priority=5)
-remove_blocker = on_command("unblock", rule=to_me(), priority=5)
-print_blocker = on_command("blocklist", rule=to_me(), priority=5)
-reboot = on_command("reboot", rule=to_me(), priority=5)
-send_temp_msg = on_command("私发", rule=to_me(), priority=5)
+# 敏感操作一律要求 SUPERUSER：权限不满足时匹配器不触发，等于直接无视
+add_blocker = on_command("block", rule=to_me(), permission=SUPERUSER, priority=5)
+remove_blocker = on_command("unblock", rule=to_me(), permission=SUPERUSER, priority=5)
+print_blocker = on_command("blocklist", rule=to_me(), permission=SUPERUSER, priority=5)
+reboot = on_command("reboot", rule=to_me(), permission=SUPERUSER, priority=5)
+send_temp_msg = on_command("私发", rule=to_me(), permission=SUPERUSER, priority=5)
 
 
 # 启动时加载
@@ -35,6 +38,13 @@ async def on_shutdown():
 @ping_checker.handle()
 async def checker_func():
     await ping_checker.finish("pong!")
+
+
+@reboot.handle()
+async def reboot_func():
+    await reboot.send("正在重启喵……")
+    # 以非零码退出，交给外层守护脚本（start.sh / start.ps1）或 Docker 拉起
+    os._exit(233)
 
 
 @blocker.handle()
