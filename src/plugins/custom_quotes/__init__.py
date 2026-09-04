@@ -1,82 +1,96 @@
 import json
-import logging
-
-from nonebot import get_driver, on_fullmatch, on_command
-from nonebot.matcher import Matcher
-from nonebot.rule import CommandArg, Message
-from nonebot.log import logger
-
-from .config import Config
-from nonebot.adapters.onebot.v11 import MessageSegment, GroupMessageEvent
-
 import os
 import random
-import re
+
+from nonebot import get_driver, on_command, on_message
+from nonebot.adapters.onebot.v11 import GroupMessageEvent, MessageSegment
+from nonebot.log import logger
+from nonebot.permission import SUPERUSER
+from nonebot.rule import to_me
+
+from .config import Config
 
 global_config = get_driver().config
 config = Config.parse_obj(global_config)
 
-# 自己做着玩的要什么可拓展性啊 硬编码！
+# 素材根目录，Config 已保证以 / 结尾
+path = config.quote_path
 
-path = global_config.quote_path
+IMAGE_EXTS = {"jpg", "jpeg", "png", "gif", "bmp", "webp"}
 
-caramel_event = on_fullmatch(("焦糖", "caramel"), priority=10, ignorecase=True)
-fb_event = on_fullmatch("发病", priority=10, ignorecase=True)
-trioxwater_event = on_fullmatch(("三氧水", "trioxwater", "三氧", "三氧猫"), priority=10, ignorecase=True)
+# 触发词(小写) -> 词条 dict，词条结构见 assets/custom_quotes/quotes.json
+_trigger_map: dict = {}
 
-# submit = on_command("submit", priority=5)
 
-def common(group_id, sub_path: str, event: GroupMessageEvent):
-    if event.group_id != group_id:
+def load_quotes() -> int:
+    """从 JSON 配置加载触发词表，返回词条数量。"""
+    global _trigger_map
+    with open(config.quote_config_filepath, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    trigger_map = {}
+    for entry in data.get("quotes", []):
+        for trigger in entry.get("triggers", []):
+            trigger_map[trigger.lower()] = entry
+    _trigger_map = trigger_map
+    return len(data.get("quotes", []))
+
+
+try:
+    load_quotes()
+except (OSError, json.JSONDecodeError) as e:
+    logger.warning(f"custom_quotes 配置加载失败，插件将不响应任何触发词: {e}")
+
+
+def _match_entry(event: GroupMessageEvent):
+    entry = _trigger_map.get(event.get_plaintext().strip().lower())
+    if entry is None:
+        return None
+    groups = entry.get("groups")
+    if groups and event.group_id not in groups:
+        return None
+    return entry
+
+
+async def _quote_rule(event: GroupMessageEvent) -> bool:
+    return _match_entry(event) is not None
+
+
+quote_matcher = on_message(rule=_quote_rule, priority=10)
+reload_quotes = on_command(
+    "reload_quotes", aliases={"重载语录"}, rule=to_me(), permission=SUPERUSER, priority=5
+)
+
+
+@quote_matcher.handle()
+async def _(event: GroupMessageEvent):
+    entry = _match_entry(event)
+    if entry is None:
         return
-    if not os.path.exists(path + sub_path):
-        raise FileNotFoundError(f"没有找到对应的文件内容。")
-    msg_count = len(os.listdir(path + sub_path))
-    dir_list = os.listdir(path + sub_path)
-    file = dir_list[random.randint(0, msg_count - 1)]
-    logger.debug(f"file: {file}")
-    return file, file.split(".")[-1]
+    # 候选池 = JSON 里的文本回复 + 素材目录下的文件，等概率抽取
+    pool = [("text", reply) for reply in entry.get("replies", [])]
+    sub_dir = entry.get("dir", "").strip("/")
+    if sub_dir:
+        dir_path = f"{path}{sub_dir}"
+        if os.path.isdir(dir_path):
+            pool += [("file", f"{dir_path}/{f}") for f in os.listdir(dir_path)]
+    if not pool:
+        await quote_matcher.finish("喵呜？内容不存在喵！")
+    kind, value = random.choice(pool)
+    if kind == "text":
+        await quote_matcher.finish(value)
+    ext = value.rsplit(".", 1)[-1].lower()
+    if ext in IMAGE_EXTS:
+        await quote_matcher.finish(MessageSegment.image(f"file:///{value}"))
+    if ext == "txt":
+        with open(value, "r", encoding="utf-8") as f:
+            await quote_matcher.finish(f.read().strip("\n"))
+    await quote_matcher.finish("喵呜？内容存在问题！")
 
-@caramel_event.handle()
-async def caramel(bot, event: GroupMessageEvent):
-    # 群聊必须是657148784
+
+@reload_quotes.handle()
+async def _():
     try:
-        file, ext = common(657148784, "/caramel", event)
-    except:
-        await caramel_event.finish("喵呜？内容不存在喵！")
-    else:
-        if ext.lower() in ["jpg", "jpeg", "png", "gif", "bmp"]:
-            await caramel_event.finish(MessageSegment.image(f"file:///{path}/caramel/{file}"))
-        elif ext.lower() in ["txt"]:
-            with open(f"{path}/caramel/{file}", "r") as f:
-                await caramel_event.finish(f.read().strip('\n'))
-        await caramel_event.finish("喵呜？内容存在问题！")
-
-
-@fb_event.handle()
-async def fb(bot, event: GroupMessageEvent):
-    try:
-        file, ext = common(657148784, "/fb", event)
-    except:
-        await fb_event.finish("喵呜？内容不存在喵！")
-    else:
-        if ext.lower() in ["jpg", "jpeg", "png", "gif", "bmp"]:
-            await fb_event.finish(MessageSegment.image(f"file:///{path}/fb/{file}"))
-        elif ext.lower() in ["txt"]:
-            with open(f"{path}/fb/{file}", "r") as f:
-                await fb_event.finish(f.read().strip('\n'))
-        await fb_event.finish("喵呜？内容存在问题！")
-
-@trioxwater_event.handle()
-async def trioxwater(bot, event: GroupMessageEvent):
-    try:
-        file, ext = common(657148784, "/trioxwater", event)
-    except:
-        await trioxwater_event.finish("喵呜？内容不存在喵！")
-    else:
-        if ext.lower() in ["jpg", "jpeg", "png", "gif", "bmp"]:
-            await trioxwater_event.finish(MessageSegment.image(f"file:///{path}/trioxwater/{file}"))
-        elif ext.lower() in ["txt"]:
-            with open(f"{path}/trioxwater/{file}", "r") as f:
-                await trioxwater_event.finish(f.read().strip('\n'))
-        await trioxwater_event.finish("喵呜？内容存在问题！")
+        count = load_quotes()
+    except (OSError, json.JSONDecodeError) as e:
+        await reload_quotes.finish(f"重载失败喵：{e}")
+    await reload_quotes.finish(f"已重载 {count} 个语录词条喵！")

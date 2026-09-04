@@ -1,0 +1,22 @@
+{
+  "quotes": [
+    {
+      "triggers": ["焦糖", "caramel"],
+      "groups": [657148784],
+      "dir": "caramel",
+      "replies": []
+    },
+    {
+      "triggers": ["发病"],
+      "groups": [657148784],
+      "dir": "fb",
+      "replies": []
+    },
+    {
+      "triggers": ["三氧水", "trioxwater", "三氧", "三氧猫"],
+      "groups": [657148784],
+      "dir": "trioxwater",
+      "replies": []
+    }
+  ]
+}
