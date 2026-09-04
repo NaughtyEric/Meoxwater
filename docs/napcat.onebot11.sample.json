@@ -1,23 +1,32 @@
 {
   "network": {
     "httpServers": [],
+    "httpSseServers": [],
     "httpClients": [],
     "websocketServers": [],
     "websocketClients": [
       {
-        "enable": true,
         "name": "triox-bot",
+        "enable": true,
         "url": "ws://127.0.0.1:1927/onebot/v11/ws",
-        "reportSelfMessage": false,
         "messagePostFormat": "array",
+        "reportSelfMessage": false,
+        "reconnectInterval": 5000,
         "token": "<填入 .env.prod 中的 ONEBOT_ACCESS_TOKEN>",
         "debug": false,
-        "heartInterval": 30000,
-        "reconnectInterval": 5000
+        "heartInterval": 30000
       }
-    ]
+    ],
+    "plugins": []
   },
   "musicSignUrl": "",
   "enableLocalFile2Url": false,
-  "parseMultMsg": false
+  "parseMultMsg": false,
+  "imageDownloadProxy": "",
+  "timeout": {
+    "baseTimeout": 10000,
+    "uploadSpeedKBps": 256,
+    "downloadSpeedKBps": 256,
+    "maxTimeout": 1800000
+  }
 }

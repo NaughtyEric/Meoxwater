@@ -7,6 +7,7 @@ dependencies = [
     "nonebot2>=2.5.0",
     "nonebot-adapter-onebot>=2.4.6",
     "nonebot-adapter-minecraft>=1.8.2",
+    "nonebot-plugin-fakemsg>=0.1.9",
 ]
 
 [tool.nonebot]
@@ -14,6 +15,7 @@ plugin_dirs = ["src/plugins"]
 builtin_plugins = []
 [tool.nonebot.plugins]
 "@local" = []
+nonebot-plugin-fakemsg = ["nonebot_plugin_fakemsg"]
 
 
 [tool.nonebot.adapters]

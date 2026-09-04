@@ -21,21 +21,24 @@
 
 ## 2. 安装并配置 NapCat
 
-1. 从 <https://github.com/NapNeko/NapCatQQ> 下载安装（需要机器上装有官方 NTQQ，
-   NapCat 提供一键安装包/Shell 版，支持无 GUI 运行）。
-2. 首次启动后扫码登录 bot 的 QQ 账号。
-3. 打开 NapCat WebUI（默认 <http://127.0.0.1:6099/webui>），在 **网络配置** 中新增一个
-   **WebSocket 客户端（反向 WS）**：
-   - URL：`ws://127.0.0.1:1927/onebot/v11/ws`
-   - Token：与 `.env.prod` 中 `ONEBOT_ACCESS_TOKEN` 相同的值
-   - 消息格式：`array`
+本仓库根目录下的 `napcat/`（已 gitignore，不随仓库分发）是已经准备好的
+NapCat Shell 终端版运行目录，详见 [`napcat/README.md`](../napcat/README.md)。
+换机器部署时该目录不会跟着 git 走，需要按该 README 重新下载/配置一份，步骤概要：
 
-   也可以直接参考本目录下的 `napcat.onebot11.sample.json`（对应 NapCat 的
-   `config/onebot11_<QQ号>.json`），把 `token` 与 `.env.prod` 保持一致。
+1. 从 <https://github.com/NapNeko/NapCatQQ/releases> 下载与本机 QQNT 版本匹配的
+   `NapCat.Shell.zip`（要求机器上已装好官方 QQNT 客户端），解压到 `napcat/` 目录。
+2. 运行 `napcat/launcher-user.bat`（终端内运行，无需管理员权限），首次启动会打印
+   二维码，用 bot 的 QQ 账号扫码登录。
+3. 登录后在 `napcat/config/` 下会生成 `onebot11_<QQ号>.json`；也可以直接复制
+   `napcat/config/onebot11.json.template` 改名使用，模板里的反向 WS 地址已经
+   指向 `ws://127.0.0.1:1927/onebot/v11/ws`。把 `token` 改成与 `.env.prod` 中
+   `ONEBOT_ACCESS_TOKEN` 相同的值，消息格式保持 `array`。
+4. 也可以不改配置文件，直接打开 NapCat WebUI（默认 <http://127.0.0.1:6099/webui>）
+   在 **网络配置** 中新增反向 WebSocket 客户端，效果相同。
 
-4. NapCat 与 bot 不在同一台机器时：`.env.prod` 的 `HOST` 改为 `0.0.0.0`，
-   NapCat 的 URL 改为 `ws://<bot机器IP>:1927/onebot/v11/ws`，并确保防火墙放行 1927 端口。
-   此时 **必须** 使用 access token 鉴权。
+NapCat 与 bot 不在同一台机器时：`.env.prod` 的 `HOST` 改为 `0.0.0.0`，
+NapCat 侧 URL 改为 `ws://<bot机器IP>:1927/onebot/v11/ws`，并确保防火墙放行 1927
+端口。此时 **必须** 使用 access token 鉴权。
 
 ## 3. 验证
 
