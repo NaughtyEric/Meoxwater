@@ -16,11 +16,13 @@ __plugin_meta__ = PluginMetadata(
     extra={},
 )
 
+config = get_plugin_config(Config)
+
 good_night = on_fullmatch(('晚安', '晚安啦', '晚安了', '晚安喵'), priority=5)
 good_morning = on_fullmatch(('早上好', '早安', '早', '早喵'), priority=5)
 
 @lru_cache(maxsize=1)
-def load_replies(file_path="replies.json"):
+def load_replies(file_path=config.mngreeting_replies_filepath):
     with open(file_path, 'r', encoding='utf-8') as f:
         return json.load(f)
 
@@ -57,7 +59,7 @@ async def _(event: GroupMessageEvent):
     t = datetime.now().time()
     sender = event.sender.user_id
     now_timestamp = time.time()
-    cooldown = get_plugin_config(Config).mngreeting_cooldown
+    cooldown = config.mngreeting_cooldown
     last_time = _user_last_trigger_time.get(sender, 0)
     if now_timestamp - last_time < cooldown:
         return
@@ -75,7 +77,7 @@ async def _(event: GroupMessageEvent):
     t = datetime.now().time()
     sender = event.sender.user_id
     now_timestamp = time.time()
-    cooldown = get_plugin_config(Config).mngreeting_cooldown
+    cooldown = config.mngreeting_cooldown
     last_time = _user_last_trigger_time.get(sender, 0)
     if now_timestamp - last_time < cooldown:
         return
