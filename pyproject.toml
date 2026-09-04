@@ -3,12 +3,20 @@ name = "meoxwater"
 version = "0.1.0"
 description = "triox-bot: NoneBot2 QQ bot"
 requires-python = ">=3.10"
+dependencies = [
+    "nonebot2>=2.5.0",
+    "nonebot-adapter-onebot>=2.4.6",
+    "nonebot-adapter-minecraft>=1.8.2",
+]
 
 [tool.nonebot]
-adapters = [
-    { name = "OneBot V11", module_name = "nonebot.adapters.onebot.v11" },
-    { name = "Minecraft", module_name = "nonebot.adapters.minecraft" },
-]
-plugins = []
 plugin_dirs = ["src/plugins"]
 builtin_plugins = []
+[tool.nonebot.plugins]
+"@local" = []
+
+
+[tool.nonebot.adapters]
+"@local" = []
+nonebot-adapter-onebot = [{name = "OneBot V11", module_name = "nonebot.adapters.onebot.v11"}]
+nonebot-adapter-minecraft = [{name = "Minecraft", module_name = "nonebot.adapters.minecraft"}]

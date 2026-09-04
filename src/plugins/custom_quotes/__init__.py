@@ -2,7 +2,7 @@ import json
 import os
 import random
 
-from nonebot import get_driver, on_command, on_message
+from nonebot import get_driver, get_plugin_config, on_command, on_message
 from nonebot.adapters.onebot.v11 import GroupMessageEvent, MessageSegment
 from nonebot.log import logger
 from nonebot.permission import SUPERUSER
@@ -11,7 +11,7 @@ from nonebot.rule import to_me
 from .config import Config
 
 global_config = get_driver().config
-config = Config.parse_obj(global_config)
+config = get_plugin_config(Config)
 
 # 素材根目录，Config 已保证以 / 结尾
 path = config.quote_path
