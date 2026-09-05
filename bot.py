@@ -13,4 +13,6 @@ driver.register_adapter(MCAdapter)
 nonebot.load_from_toml("pyproject.toml")
 
 if __name__ == "__main__":
-    nonebot.run(host="127.0.0.1", port=1927)
+    # host/port 由 .env 的 HOST/PORT 决定，不在此处硬编码（否则会覆盖配置，
+    # 导致 Docker/跨机部署时 HOST=0.0.0.0 等设置形同虚设）
+    nonebot.run()

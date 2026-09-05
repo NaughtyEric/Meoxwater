@@ -9,3 +9,6 @@ nonebot-adapter-minecraft>=1.8.2
 
 # NoneBot 脚手架 CLI (nb run 等)
 nb-cli>=1.7.4
+
+# 伪造转发消息
+nonebot-plugin-fakemsg>=0.1.9

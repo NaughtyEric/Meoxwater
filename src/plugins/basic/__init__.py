@@ -1,15 +1,18 @@
 import os
 import re
-from nonebot import get_driver, log, Bot
+from nonebot import get_driver, get_plugin_config, log, Bot
 from nonebot import on_command, on_message
 from nonebot.adapters.onebot.v11 import MessageEvent
 from nonebot.matcher import Matcher
 from nonebot.permission import SUPERUSER
 from nonebot.rule import to_me
 
+from .config import Config
+
 global_config = get_driver().config
-BLOCKLIST = global_config.blocklist
-ADMIN = global_config.admin
+config = get_plugin_config(Config)
+BLOCKLIST = config.blocklist
+ADMIN = config.admin
 
 # 检测是否在线
 ping_checker = on_command("ping", aliases={"测试"}, rule=to_me(), priority=5)
