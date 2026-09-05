@@ -1,0 +1,15 @@
+.git
+.idea
+.venv
+napcat/
+docker/
+__pycache__
+**/__pycache__
+*.pyc
+*.egg-info
+
+# 真实密钥/账号配置不进镜像，运行时通过 compose 的 env_file 注入
+.env
+.env.dev
+.env.prod
+.env.docker

@@ -47,8 +47,11 @@ NapCat 侧 URL 改为 `ws://<bot机器IP>:1927/onebot/v11/ws`，并确保防火�
 3. SUPERUSER @bot 发送 `/reboot`，bot 回复后进程退出并被守护脚本拉起，
    NapCat 侧会按 `reconnectInterval` 自动重连。
 
-## 4. Docker 封装（TODO，最后再做）
+## 4. Docker 一键部署
 
-现有 `Dockerfile` / `docker-compose.yml` 尚不可用（镜像内没有 Python，挂载的是
-Windows 虚拟环境）。封装时需要：换 `python:3.13-slim` 基底、容器内安装 requirements、
-把 NapCat 作为同网络的 service 编入 compose，并将 `HOST` 设为 `0.0.0.0`。
+`docker compose up -d --build` 即可同时拉起 bot 与 NapCat（Linux 无头版）两个容器，
+细节见 [`docker/README.md`](../docker/README.md)：镜像基于 `python:3.13-slim`，
+NapCat 用官方 `mlikiowa/napcat-docker` 镜像，两者通过 compose 内网互连。
+
+注意这是一套独立的部署，与本文档前面几节介绍的"裸机 + `napcat/` 本地 Shell 版"
+不共享 QQ 登录状态，二选一即可。

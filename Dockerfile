@@ -1,4 +1,12 @@
-FROM ubuntu:22.04
+FROM python:3.13-slim
+
 WORKDIR /app
-RUN apt update && apt install -y bash
-CMD ["bash", "start.sh"]
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 1927
+
+CMD ["python", "bot.py"]
