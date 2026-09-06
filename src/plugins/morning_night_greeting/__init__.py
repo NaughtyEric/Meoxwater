@@ -3,6 +3,7 @@ from nonebot.adapters.onebot.v11 import GroupMessageEvent
 from nonebot.plugin import PluginMetadata
 from .config import Config
 import json
+import random
 from functools import lru_cache
 from datetime import datetime
 import time
@@ -67,7 +68,7 @@ async def _(event: GroupMessageEvent):
     try:
         responses = get_current_period_response("night", t)
         if responses:
-            await good_night.finish(responses[0])
+            await good_night.finish(random.choice(responses))
     except ValueError:
         await good_night.finish("没有匹配的晚安时间段，请联系管理员检查配置文件。")
 
@@ -85,7 +86,7 @@ async def _(event: GroupMessageEvent):
     try:
         responses = get_current_period_response("morning", t)
         if responses:
-            await good_morning.finish(responses[0])
+            await good_morning.finish(random.choice(responses))
     except ValueError:
         await good_morning.finish("没有匹配的早安时间段，请联系管理员检查配置文件。")
 
