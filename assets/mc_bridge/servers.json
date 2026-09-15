@@ -1,0 +1,26 @@
+{
+  "_comment": "server_name 必须与鹊桥(QueQiao) config.yml 中的 server_name 完全一致",
+  "servers": [
+    {
+      "server_name": "survival",
+      "groups": [934952815],
+      "mc_to_qq": {
+        "chat": true,
+        "join": true,
+        "quit": true,
+        "death": true,
+        "achievement": true
+      },
+      "qq_to_mc": true,
+      "allow_command": false,
+      "formats": {
+        "chat": "[{server}] <{player}> {message}",
+        "join": "[{server}] {player} 加入了游戏",
+        "quit": "[{server}] {player} 离开了游戏",
+        "death": "[{server}] {message}",
+        "achievement": "[{server}] {player} 达成了进度 [{message}]",
+        "qq_to_mc": "[QQ] <{sender}> {message}"
+      }
+    }
+  ]
+}
